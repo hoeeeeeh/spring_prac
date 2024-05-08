@@ -1,5 +1,9 @@
 package com.example.springbootex;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +24,10 @@ import java.util.Objects;
 // 그래서 @ResponseBody 가 필요한데, RestController 의 메타 애노테이션에 들어있다.
 public class HelloController {
     private final HelloService helloService;
-
-    public HelloController(HelloService helloService) {
+    private final ApplicationContext applicationContext;
+    public HelloController(HelloService helloService, ApplicationContext applicationContext) {
         this.helloService = helloService;
+        this.applicationContext = applicationContext;
     }
 
     // /hello 로 들어오는 요청 중에서, Get 요청만 처리
@@ -33,6 +38,7 @@ public class HelloController {
     public String hello(String name) {
         return helloService.sayHello(Objects.requireNonNull(name));
     }
+
 }
 
 

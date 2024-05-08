@@ -18,6 +18,18 @@ import org.springframework.web.servlet.DispatcherServlet;
 @ComponentScan
 // 컴포넌트 어노테이션이 붙은 클래스를 찾아서 빈으로 등록 해줘
 public class HelloWebServer {
+
+    @Bean
+    public ServletWebServerFactory servletWebServerFactory() {
+        // tomcat 이 아닌 다른 servlet 이 사용할 수 도 있으니까, return type 은 추상화된 Type 을 이용하는게 좋다
+        return new TomcatServletWebServerFactory();
+    }
+    @Bean
+    public DispatcherServlet dispatcherServlet(){
+        return new DispatcherServlet();
+    }
+
+
     public static void main(String[] args) {
 
         //GenericWebApplicationContext applicationContext = new GenericWebApplicationContext() {
@@ -27,7 +39,16 @@ public class HelloWebServer {
             protected void onRefresh() {
                 super.onRefresh();
                 // 생략하면 안됨. Generic Web Application Context 에서도 onRefresh hook 메소드를 확장해서 추가적인 작업을 하기 때문.
-                ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+
+                //Spring container 에 등록한 Servlet 가져오기
+                ServletWebServerFactory serverFactory = this.getBean(ServletWebServerFactory.class);
+                DispatcherServlet dispatcherServlet = this.getBean(DispatcherServlet.class);
+
+                // dispatcherServlet 이 상속한 class 에 이미 setApplicationContext 와 유사한 일을 하는 함수가 존재하고,
+                // 디스패처 서블릿이 등록 되는 시점에 스프링 컨테이너가 어플리케이션 컨텍스트를 주입해준다.
+                // dispatcherServlet.setApplicationContext(this);
+
+
                 WebServer webServer = serverFactory.getWebServer(servletContext -> {
                     servletContext.addServlet("dispatcherServlet",
                             new DispatcherServlet(this)
