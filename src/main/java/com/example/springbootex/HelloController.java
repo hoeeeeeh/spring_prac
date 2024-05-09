@@ -24,10 +24,9 @@ import java.util.Objects;
 // 그래서 @ResponseBody 가 필요한데, RestController 의 메타 애노테이션에 들어있다.
 public class HelloController {
     private final HelloService helloService;
-    private final ApplicationContext applicationContext;
-    public HelloController(HelloService helloService, ApplicationContext applicationContext) {
+
+    public HelloController(HelloService helloService) {
         this.helloService = helloService;
-        this.applicationContext = applicationContext;
     }
 
     // /hello 로 들어오는 요청 중에서, Get 요청만 처리
@@ -36,7 +35,8 @@ public class HelloController {
     //RestController 를 사용해서 리퀘스트 맵핑 없이, 메소드에 바로 url 매핑
     @GetMapping("/hello")
     public String hello(String name) {
-        return helloService.sayHello(Objects.requireNonNull(name));
+        if (name == null || name.trim().length() == 0) throw new IllegalArgumentException();
+        return helloService.sayHello(name);
     }
 
 }
